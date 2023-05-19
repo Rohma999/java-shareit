@@ -11,7 +11,7 @@ public class UserStorageImpl implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
     private final Set<String> emails = new HashSet<>();
 
-    private long id = 1;
+    private long counterId = 0;
 
     @Override
     public User create(User user) {
@@ -20,7 +20,7 @@ public class UserStorageImpl implements UserStorage {
                     String.format("Пользователь с таким email %s уже существует", user.getEmail())
             );
         }
-        user.setId(id++);
+        user.setId(++counterId);
         users.put(user.getId(), user);
         emails.add(user.getEmail());
         return user;
@@ -32,29 +32,25 @@ public class UserStorageImpl implements UserStorage {
     }
 
     @Override
-    public Optional<User> findById(Long id) {
+    public Optional<User> getUser(Long id) {
         return Optional.ofNullable(users.get(id));
     }
 
     @Override
-    public Optional<User> update(User user, Long userId) {
-        String email = user.getEmail();
-        String name = user.getName();
-        User userRep = users.get(userId);
-        if (userRep != null && email != null) {
-            if (!userRep.getEmail().equals(email) && emails.contains(email)) {
+    public User update(User newUser,Long userId) {
+        User user = users.get(userId);
+        String email = newUser.getEmail();
+            if (!user.getEmail().equals(email) && emails.contains(email)) {
                 throw new EmailAlreadyExistException(
                         String.format("Невозможно поменять email на %s,он уже занят", email)
                 );
             }
-            emails.remove(userRep.getEmail());
-            userRep.setEmail(email);
+            user.setName(newUser.getName());
+            emails.remove(user.getEmail());
+            user.setEmail(email);
             emails.add(email);
-        }
-        if (userRep != null && name != null) {
-            userRep.setName(name);
-        }
-        return Optional.ofNullable(users.get(userId));
+
+        return user;
     }
 
 

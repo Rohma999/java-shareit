@@ -36,15 +36,15 @@ public class UserController {
     }
 
     @GetMapping
-    public Collection<UserDto> findAll() {
+    public Collection<UserDto> getAll() {
         log.info("Запрос на получение всех пользователей");
         return userService.getAllUsers();
     }
 
     @GetMapping("{userId}")
-    public UserDto findById(@PathVariable long userId) {
+    public UserDto getUser(@PathVariable long userId) {
         log.info("Запрос на получение пользователя с id {}", userId);
-        return userService.findById(userId);
+        return userService.getUser(userId);
     }
 
     @DeleteMapping("{userId}")

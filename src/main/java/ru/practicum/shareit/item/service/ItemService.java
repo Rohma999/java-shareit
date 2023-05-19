@@ -10,7 +10,7 @@ public interface ItemService {
 
     Collection<ItemDto> getAllUserItems(long userId);
 
-    ItemDto findById(long itemId);
+    ItemDto getItem(long itemId);
 
     ItemDto update(long userId,long itemId,ItemDto itemDto);
 

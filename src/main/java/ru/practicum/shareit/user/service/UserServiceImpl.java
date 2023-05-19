@@ -40,8 +40,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto findById(Long userId) {
-        User user = userStorage.findById(userId).orElseThrow(
+    public UserDto getUser(Long userId) {
+        User user = userStorage.getUser(userId).orElseThrow(
                 () -> new EntityNotFoundException(String.format("Пользователь с id %d не существует", userId)));
         UserDto responseDto = UserMapper.toUserDto(user);
         log.info("Передаем в контроллер пользователя с id {} : {}", userId, responseDto);
@@ -50,10 +50,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto update(UserDto userDto, Long userId) {
-        User user = userStorage.update(UserMapper.toUser(userDto), userId).orElseThrow(
-                () -> new EntityNotFoundException(String.format("Пользователя с id %d не существует", userId))
-        );
-        UserDto responseDto = UserMapper.toUserDto(user);
+        final User user = userStorage.getUser(userId).orElseThrow(
+                () -> new EntityNotFoundException(String.format("Пользователь с id %d не существует", userId)));
+
+        if (userDto.getName() == null) {
+            userDto.setName(user.getName());
+        }
+        if (userDto.getEmail() == null) {
+            userDto.setEmail(user.getEmail());
+        }
+        User newUser = userStorage.update(UserMapper.toUser(userDto),userId);
+        UserDto responseDto = UserMapper.toUserDto(newUser);
         log.info("Передаем в контроллер обновленного пользователя с id {} : {}", userId, responseDto);
         return responseDto;
     }

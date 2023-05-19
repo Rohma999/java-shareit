@@ -11,11 +11,11 @@ import java.util.stream.Collectors;
 public class ItemStorageImpl implements ItemStorage {
 
     private final Map<Long, Item> items = new HashMap<>();
-    private long id = 1;
+    private long counterId = 0;
 
     @Override
     public Item create(Item item) {
-        item.setId(id++);
+        item.setId(++counterId);
         items.put(item.getId(), item);
         return item;
     }
@@ -27,32 +27,17 @@ public class ItemStorageImpl implements ItemStorage {
     }
 
     @Override
-    public Optional<Item> findById(long itemId) {
+    public Optional<Item> getItem(long itemId) {
         return Optional.ofNullable(items.get(itemId));
     }
 
     @Override
-    public Optional<Item> update(long userId, long itemId, Item item) {
-        Item itemRep = items.get(itemId);
-        if (itemRep != null) {
-            if (itemRep.getOwnerId() != userId) {
-                throw new NotOwnerException("Вы не являетесь владельцем данной вещи.");
-            }
-            String name = item.getName();
-            String description = item.getDescription();
-            Boolean available = item.getAvailable();
-            if (name != null) {
-                itemRep.setName(name);
-            }
-            if (description != null) {
-                itemRep.setDescription(description);
-            }
-            if (available != null) {
-                itemRep.setAvailable(available);
-            }
-            return Optional.of(items.get(itemId));
-        }
-        return Optional.empty();
+    public Item update(Item newItem ,long itemId) {
+        Item item = items.get(itemId);
+        item.setName(newItem.getName());
+        item.setDescription(newItem.getDescription());
+        item.setAvailable(newItem.getAvailable());
+        return item;
     }
 
     @Override

@@ -44,9 +44,9 @@ public class ItemController {
     }
 
     @GetMapping("{itemId}")
-    public ItemDto findById(@PathVariable long itemId) {
+    public ItemDto getItem(@PathVariable long itemId) {
         log.info("Запрос на получение вещи с id {} ", itemId);
-        return itemService.findById(itemId);
+        return itemService.getItem(itemId);
     }
 
     @GetMapping
@@ -58,7 +58,8 @@ public class ItemController {
     @GetMapping("search")
     public Collection<ItemDto> search(@RequestParam(required = false) String text) {
         log.info("Запрос на получение списка вещей содержащих : {} ", text);
-        if (text.isBlank()) {
+        if (text == null || text.isBlank()) {
+            log.info("Возращаем пустой список");
             return Collections.emptyList();
         }
         return itemService.search(text);
