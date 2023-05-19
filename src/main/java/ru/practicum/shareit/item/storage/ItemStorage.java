@@ -13,7 +13,7 @@ public interface ItemStorage {
 
     Optional<Item> getItem(long itemId);
 
-    Item update(Item item ,long itemId);
+    Item update(Item item, long itemId);
 
     Collection<Item> search(String text);
 }

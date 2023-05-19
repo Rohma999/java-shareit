@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item.storage;
 
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.exception.NotOwnerException;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.*;
@@ -32,7 +31,7 @@ public class ItemStorageImpl implements ItemStorage {
     }
 
     @Override
-    public Item update(Item newItem ,long itemId) {
+    public Item update(Item newItem, long itemId) {
         Item item = items.get(itemId);
         item.setName(newItem.getName());
         item.setDescription(newItem.getDescription());
