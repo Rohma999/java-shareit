@@ -1,2 +1,4 @@
 # java-shareit
-Template repository for Shareit project.
+Shareit project.
+
+![ER-diagram database](/scheme/scheme.png)
