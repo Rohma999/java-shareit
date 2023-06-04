@@ -11,7 +11,7 @@ import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 
-import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -36,8 +36,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Collection<UserDto> getAllUsers() {
-        Collection<UserDto> users = userRepository.findAll().stream().map(UserMapper::toUserDto)
+    public List<UserDto> getAllUsers() {
+        List<UserDto> users = userRepository.findAll().stream().map(UserMapper::toUserDto)
                 .collect(Collectors.toList());
         log.info("Передаем в контроллер список всех пользователей : {}", users);
         return users;

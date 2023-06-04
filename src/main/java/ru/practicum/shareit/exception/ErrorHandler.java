@@ -34,7 +34,7 @@ public class ErrorHandler {
     @ExceptionHandler
     public ErrorResponse handleConversionFailedException(final MethodArgumentTypeMismatchException e) {
         log.error("500 {}", e.getMessage());
-        return new ErrorResponse("Unknown state: " + e.getValue().toString());
+        return new ErrorResponse("Unknown state: " + e.getValue());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

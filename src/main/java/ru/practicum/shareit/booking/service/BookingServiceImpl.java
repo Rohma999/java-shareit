@@ -20,6 +20,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -93,7 +94,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(
                 () -> new EntityNotFoundException(String.format("Бронирование с id %d не существует", bookingId))
         );
-        User user = userRepository.findById(userId).orElseThrow(
+        userRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFoundException(String.format("Пользователя с id %d не существует", userId))
         );
         if (!booking.getBooker().getId().equals(userId) && !booking.getItem().getOwner().getId().equals(userId)) {
@@ -106,8 +107,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public Collection<BookingDtoResponse> findAllByBookerId(BookingState bookingState, long userId) {
-        User booker = userRepository.findById(userId).orElseThrow(
+    public List<BookingDtoResponse> findAllByBookerId(BookingState bookingState, long userId) {
+        userRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFoundException(String.format("Пользователя с id %d не существует", userId))
         );
         Collection<Booking> bookings;
@@ -135,7 +136,7 @@ public class BookingServiceImpl implements BookingService {
                 bookings = new ArrayList<>();
                 break;
         }
-        Collection<BookingDtoResponse> bookingsDto = bookings.stream().map(BookingMapper::toBookingDtoResponse)
+        List<BookingDtoResponse> bookingsDto = bookings.stream().map(BookingMapper::toBookingDtoResponse)
                 .collect(Collectors.toList());
         log.info("Возвращаем в контроллер бронирования со статусом {} пользователя с id {}  : {}",
                 bookingState, userId, bookingsDto);
@@ -144,8 +145,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public Collection<BookingDtoResponse> findAllByOwnerId(BookingState bookingState, long userId) {
-        User owner = userRepository.findById(userId).orElseThrow(
+    public List<BookingDtoResponse> findAllByOwnerId(BookingState bookingState, long userId) {
+        userRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFoundException(String.format("Пользователя с id %d не существует", userId))
         );
         Collection<Booking> bookings;
@@ -173,7 +174,7 @@ public class BookingServiceImpl implements BookingService {
                 bookings = new ArrayList<>();
                 break;
         }
-        Collection<BookingDtoResponse> bookingsDto = bookings.stream().map(BookingMapper::toBookingDtoResponse)
+        List<BookingDtoResponse> bookingsDto = bookings.stream().map(BookingMapper::toBookingDtoResponse)
                 .collect(Collectors.toList());
         log.info("Возвращаем в контроллер бронирования со статусом {} пользователя с id {}  : {}",
                 bookingState, userId, bookingsDto);

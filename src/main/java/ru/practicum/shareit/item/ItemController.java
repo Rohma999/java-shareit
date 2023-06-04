@@ -12,13 +12,15 @@ import ru.practicum.shareit.item.dto.ItemDtoRequest;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/items")
 public class ItemController {
+
+    public static final String USER_ID = "X-Sharer-User-Id";
 
     private final ItemService itemService;
 
@@ -29,7 +31,7 @@ public class ItemController {
 
     @PostMapping
     public ItemDtoResponse create(
-            @RequestHeader("X-Sharer-User-Id") long userId,
+            @RequestHeader(USER_ID) long userId,
             @Validated(Create.class) @RequestBody ItemDtoRequest itemDto
     ) {
         log.info("Запрос на добавление вещи {} пользователю с id {}", itemDto, userId);
@@ -38,7 +40,7 @@ public class ItemController {
 
     @PostMapping("{itemId}/comment")
     public CommentDtoResponse addComment(
-            @RequestHeader("X-Sharer-User-Id") long userId,
+            @RequestHeader(USER_ID) long userId,
             @PathVariable long itemId,
             @Validated(Create.class) @RequestBody CommentDtoRequest commentDtoRequest
     ) {
@@ -48,7 +50,7 @@ public class ItemController {
 
     @PatchMapping("{itemId}")
     public ItemDtoResponse patch(
-            @RequestHeader("X-Sharer-User-Id") long userId,
+            @RequestHeader(USER_ID) long userId,
             @PathVariable Long itemId,
             @Valid @RequestBody ItemDtoRequest itemDtoRequest
     ) {
@@ -57,19 +59,19 @@ public class ItemController {
     }
 
     @GetMapping("{itemId}")
-    public ItemDtoResponse getItem(@PathVariable long itemId,@RequestHeader("X-Sharer-User-Id") long userId) {
-        log.info("Запрос на получение вещи с id {} пользователем с id {} ", itemId,userId);
-        return itemService.getItem(itemId,userId);
+    public ItemDtoResponse getItem(@PathVariable long itemId, @RequestHeader(USER_ID) long userId) {
+        log.info("Запрос на получение вещи с id {} пользователем с id {} ", itemId, userId);
+        return itemService.getItem(itemId, userId);
     }
 
     @GetMapping
-    public Collection<ItemDtoResponse> findAll(@RequestHeader("X-Sharer-User-Id") long userId) {
+    public List<ItemDtoResponse> findAll(@RequestHeader(USER_ID) long userId) {
         log.info("Запрос на получение всех вещей пользователя с id {} ", userId);
         return itemService.getAllUserItems(userId);
     }
 
     @GetMapping("search")
-    public Collection<ItemDtoResponse> search(@RequestParam(required = false) String text) {
+    public List<ItemDtoResponse> search(@RequestParam(required = false) String text) {
         log.info("Запрос на получение списка вещей содержащих : {} ", text);
         if (text == null || text.isBlank()) {
             log.info("Возращаем пустой список");
