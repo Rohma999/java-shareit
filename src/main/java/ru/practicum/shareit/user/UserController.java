@@ -9,7 +9,7 @@ import ru.practicum.shareit.group.Create;
 import ru.practicum.shareit.group.Update;
 import ru.practicum.shareit.user.service.UserService;
 
-import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -36,7 +36,7 @@ public class UserController {
     }
 
     @GetMapping
-    public Collection<UserDto> getAll() {
+    public List<UserDto> getAll() {
         log.info("Запрос на получение всех пользователей");
         return userService.getAllUsers();
     }

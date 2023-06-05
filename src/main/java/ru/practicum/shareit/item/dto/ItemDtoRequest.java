@@ -9,8 +9,8 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @Builder
-public class ItemDto {
-    private Long id;
+public class ItemDtoRequest {
+    //  private Long id;
     @NotBlank(groups = Create.class)
     private String name;
     @NotBlank(groups = Create.class)
