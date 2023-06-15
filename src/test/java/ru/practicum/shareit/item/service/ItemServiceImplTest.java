@@ -11,6 +11,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import ru.practicum.shareit.exception.EntityNotFoundException;
+import ru.practicum.shareit.exception.NotOwnerException;
 import ru.practicum.shareit.item.dto.CommentDtoRequest;
 import ru.practicum.shareit.item.dto.CommentDtoResponse;
 import ru.practicum.shareit.item.dto.ItemDtoRequest;
@@ -57,7 +58,6 @@ class ItemServiceImplTest {
         BookingDtoResponse bookingDtoResponse = bookingService.create(bookingDtoRequest, booker.getId());
         bookingService.approve(bookingDtoResponse.getId(), true, userDto.getId());
         CommentDtoRequest commentDtoRequest = CommentDtoRequest.builder().text(commentText).build();
-
         return itemService.addComment(booker.getId(), itemDto.getId(), commentDtoRequest);
     }
 
@@ -190,5 +190,14 @@ class ItemServiceImplTest {
         Exception exception = assertThrows(EntityNotFoundException.class,
                 () -> itemService.getItem(7, userDto.getId()));
         assertEquals("Вещь с id 7 не существует", exception.getMessage());
+    }
+
+    @Test
+    void updateWhenNotOwnerTest() {
+        ItemDtoRequest dto = ItemDtoRequest.builder()
+                .id(itemDto.getId()).name("Bear").description("soft bear").available(false).build();
+        Exception exception = assertThrows(NotOwnerException.class,
+                () -> itemService.update(999, dto.getId(), dto));
+        assertEquals("Вы не являетесь владельцем данной вещи", exception.getMessage());
     }
 }

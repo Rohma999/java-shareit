@@ -129,7 +129,7 @@ public class ItemServiceImpl implements ItemService {
                 () -> new EntityNotFoundException(String.format("Вещь с id %d не существует", itemId))
         );
         if (item.getOwner().getId() != userId) {
-            throw new NotOwnerException("Вы не являетесь владельцем данной вещи.");
+            throw new NotOwnerException("Вы не являетесь владельцем данной вещи");
         }
         String name = itemDtoRequest.getName();
         String description = itemDtoRequest.getDescription();
