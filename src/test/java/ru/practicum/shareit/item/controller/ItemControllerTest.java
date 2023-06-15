@@ -36,8 +36,8 @@ class ItemControllerTest {
             .authorName("Paul")
             .created(now())
             .build();
-    private final ItemDtoResponse itemDtoResponse = ItemDtoResponse.builder().
-            id(1L)
+    private final ItemDtoResponse itemDtoResponse = ItemDtoResponse.builder()
+            .id(1L)
             .name("blue pen")
             .description("my blue pen")
             .available(true)

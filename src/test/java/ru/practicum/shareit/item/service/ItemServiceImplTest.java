@@ -26,7 +26,6 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 import static java.time.LocalDateTime.now;
-import static java.util.List.of;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
