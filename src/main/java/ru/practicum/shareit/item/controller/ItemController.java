@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +12,14 @@ import ru.practicum.shareit.item.dto.ItemDtoRequest;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.Collections;
 import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/items")
+@Validated
 public class ItemController {
 
     public static final String USER_ID = "X-Sharer-User-Id";
@@ -65,18 +67,26 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDtoResponse> findAll(@RequestHeader(USER_ID) long userId) {
-        log.info("Запрос на получение всех вещей пользователя с id {} ", userId);
-        return itemService.getAllUserItems(userId);
+    public List<ItemDtoResponse> findAll(
+            @RequestHeader(USER_ID) long userId,
+            @RequestParam(defaultValue = "0") @Min(0) int from,
+            @RequestParam(defaultValue = "10") @Min(1) int size
+    ) {
+        log.info("Запрос на получение всех вещей пользователя с id {},c {} элемента, количество {} ", userId, from, size);
+        return itemService.getAllUserItems(userId, from, size);
     }
 
     @GetMapping("search")
-    public List<ItemDtoResponse> search(@RequestParam(required = false) String text) {
+    public List<ItemDtoResponse> search(
+            @RequestParam(required = false) String text,
+            @RequestParam(defaultValue = "0") @Min(0) int from,
+            @RequestParam(defaultValue = "10") @Min(1) int size
+    ) {
         log.info("Запрос на получение списка вещей содержащих : {} ", text);
         if (text == null || text.isBlank()) {
             log.info("Возращаем пустой список");
             return Collections.emptyList();
         }
-        return itemService.search(text);
+        return itemService.search(text, from, size);
     }
 }

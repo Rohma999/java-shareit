@@ -1,12 +1,15 @@
 package ru.practicum.shareit.item.dto;
 
 
-import lombok.Getter;
+import lombok.*;
 import ru.practicum.shareit.group.Create;
 
 import javax.validation.constraints.NotBlank;
 
-@Getter
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CommentDtoRequest {
     @NotBlank(groups = Create.class)
     private String text;
