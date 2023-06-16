@@ -25,7 +25,7 @@ class ItemRequestDtoTest {
     JacksonTester<ResponseItemRequestDto> json;
 
     @Test
-    void testSerialize() throws Exception {
+    void serializeTest() throws Exception {
         long bookingId = 1;
         long itemId = 1;
         long ownerId = 2;

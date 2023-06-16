@@ -60,7 +60,7 @@ class BookingControllerTest {
 
 
     @Test
-    void createBooking() throws Exception {
+    void shouldCreateBooking() throws Exception {
 
         when(bookingService.create(request, bookerId))
                 .thenReturn(response);
@@ -85,7 +85,7 @@ class BookingControllerTest {
     }
 
     @Test
-    void createBookingWhenStartDateIsWrong() throws Exception {
+    void shouldNOtCreateBookingWhenStartDateIsWrong() throws Exception {
         BookingDtoRequest addBookingDto = BookingDtoRequest.builder().start(null).end(end)
                 .itemId(itemId).build();
 
@@ -99,7 +99,7 @@ class BookingControllerTest {
     }
 
     @Test
-    void createBookingWhenEndDateIsWrong() throws Exception {
+    void shouldNOtCreateBookingWhenEndDateIsWrong() throws Exception {
         BookingDtoRequest addBookingDto = BookingDtoRequest.builder().start(start).end(null)
                 .itemId(itemId).build();
 
@@ -113,7 +113,7 @@ class BookingControllerTest {
     }
 
     @Test
-    void approveBooking() throws Exception {
+    void shouldApproveBooking() throws Exception {
         long ownerId = 6L;
 
         when(bookingService.approve(bookingId, true, ownerId))
@@ -139,7 +139,7 @@ class BookingControllerTest {
     }
 
     @Test
-    void getBooking() throws Exception {
+    void shouldGetBookingTest() throws Exception {
         long userId = 5L;
         when(bookingService.getBooking(bookingId, userId))
                 .thenReturn(response);
@@ -163,7 +163,7 @@ class BookingControllerTest {
     }
 
     @Test
-    void getBookingWhenBookingDoesNotExistShouldReturnStatus404() throws Exception {
+    void getBookingWhenEntityNotFoundShouldReturnStatus404() throws Exception {
         long bookingId = 991L;
         long userId = 5L;
 
@@ -183,7 +183,7 @@ class BookingControllerTest {
     }
 
     @Test
-    void findBookingsByBookerId() throws Exception {
+    void shouldFindBookingsByBookerId() throws Exception {
         long userId = 5L;
         long itemId1 = 1L;
         long itemId2 = 2L;
@@ -243,7 +243,7 @@ class BookingControllerTest {
     }
 
     @Test
-    void findBookingsByOwnerId() throws Exception {
+    void shouldFindBookingsByOwnerId() throws Exception {
         long ownerId = 4L;
         long userId = 5L;
         long itemId1 = 1L;

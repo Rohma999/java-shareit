@@ -43,13 +43,13 @@ class UserServiceImplTest {
     }
 
     @Test
-    void nullTest() {
+    void shouldNotNullTest() {
         UserDto dto = userService.create(saveUserDto("Gena", "Gena@mail.com"));
         assertNotEquals(null, dto);
     }
 
     @Test
-    void getTest() {
+    void shouldGetTest() {
         userService.create(userDto);
         User user = entityManager.createQuery(
                         "SELECT user " +
@@ -65,7 +65,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void updateTest() {
+    void shouldUpdateTest() {
         userService.create(userDto);
         User user = entityManager.createQuery(
                         "SELECT user " +
@@ -89,7 +89,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void createTest() {
+    void shouldCreateTest() {
         userService.create(userDto);
         User user = entityManager.createQuery(
                         "SELECT user " +
@@ -104,7 +104,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void deleteTest() {
+    void shouldDeleteTest() {
         addUsers();
         List<User> usersBefore = entityManager.createQuery(
                 "SELECT user " +
@@ -120,7 +120,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void emailExceptionTest() {
+    void shouldThrowEmailExceptionTest() {
         userService.create(saveUserDto("Jack", "jack@mail.com"));
         Exception exception = assertThrows(DataIntegrityViolationException.class,
                 () -> userService.create(saveUserDto("Jack", "jack@mail.com")));
@@ -129,7 +129,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void getAllTest() {
+    void shouldGetAllTest() {
         addUsers();
         List<User> users = entityManager.createQuery(
                 "SELECT user " +

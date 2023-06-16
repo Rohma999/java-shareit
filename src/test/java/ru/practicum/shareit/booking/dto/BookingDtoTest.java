@@ -21,7 +21,7 @@ public class BookingDtoTest {
     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     @Test
-    void testSerialize() throws Exception {
+    void serializeTest() throws Exception {
 
         LocalDateTime start = LocalDateTime.parse("2023-06-06T10:00:00", dateTimeFormatter);
         LocalDateTime end = LocalDateTime.parse("2023-06-07T11:00:00", dateTimeFormatter);

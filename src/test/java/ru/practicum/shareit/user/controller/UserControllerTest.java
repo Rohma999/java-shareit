@@ -7,7 +7,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.exception.EntityNotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -40,11 +39,9 @@ class UserControllerTest {
     private MockMvc mvc;
 
     @Test
-    void saveUserValidationExceptionTest() throws Exception {
-        when(userService.create(any(UserDto.class)))
-                .thenThrow(ValidationException.class);
+    void shouldNotCreateWhenUserNameEmptyTest() throws Exception {
         mvc.perform(post("/users")
-                        .content(mapper.writeValueAsString(userDto))
+                        .content(mapper.writeValueAsString(UserDto.builder().email("rr@mail.com").build()))
                         .contentType(APPLICATION_JSON)
                         .characterEncoding(UTF_8)
                         .accept(APPLICATION_JSON))
@@ -52,7 +49,7 @@ class UserControllerTest {
     }
 
     @Test
-    void updateTest() throws Exception {
+    void shouldUpdateTest() throws Exception {
         when(userService.update(any(), anyLong()))
                 .thenReturn(userDto);
         mvc.perform(patch("/users/{userId}", 1)
@@ -67,7 +64,7 @@ class UserControllerTest {
     }
 
     @Test
-    void getUserByIdTest() throws Exception {
+    void shouldGetUserByIdTest() throws Exception {
         when(userService.getUser(any()))
                 .thenReturn(userDto);
         mvc.perform(get("/users/{userId}", 1)
@@ -82,7 +79,7 @@ class UserControllerTest {
     }
 
     @Test
-    void deleteUserByIdTest() throws Exception {
+    void shouldDeleteUserByIdTest() throws Exception {
         mvc.perform(delete("/users/{userId}", 1)
                         .contentType(APPLICATION_JSON)
                         .accept(APPLICATION_JSON))
@@ -90,7 +87,7 @@ class UserControllerTest {
     }
 
     @Test
-    void saveTest() throws Exception {
+    void shouldSaveTest() throws Exception {
         when(userService.create(any(UserDto.class))).thenReturn(userDto);
         mvc.perform(post("/users")
                         .content(mapper.writeValueAsString(userDto))
@@ -104,11 +101,9 @@ class UserControllerTest {
     }
 
     @Test
-    void saveUserEmailExceptionTest() throws Exception {
-        when(userService.create(any(UserDto.class)))
-                .thenThrow(ValidationException.class);
+    void shouldNotCreateWhenEmailEmpty() throws Exception {
         mvc.perform(post("/users")
-                        .content(mapper.writeValueAsString(userDto))
+                        .content(mapper.writeValueAsString(UserDto.builder().name("Vova").build()))
                         .contentType(APPLICATION_JSON)
                         .characterEncoding(UTF_8)
                         .accept(APPLICATION_JSON)
@@ -117,7 +112,7 @@ class UserControllerTest {
     }
 
     @Test
-    void getUserNotFoundExceptionTest() throws Exception {
+    void shouldNotGetUserWhenNotFoundExceptionTest() throws Exception {
         when(userService.getUser(any()))
                 .thenThrow(EntityNotFoundException.class);
         mvc.perform(get("/users/{userId}", 7)
@@ -126,7 +121,7 @@ class UserControllerTest {
     }
 
     @Test
-    void getAllTest() throws Exception {
+    void shouldGetAllTest() throws Exception {
         when(userService.getAllUsers()).thenReturn(List.of(userDto));
         mvc.perform(get("/users"))
                 .andExpect(jsonPath("$[0].id", is(userDto.getId()), Long.class))

@@ -60,7 +60,7 @@ class ItemControllerTest {
     private MockMvc mvc;
 
     @Test
-    void saveTest() throws Exception {
+    void shouldCreateTest() throws Exception {
         when(itemService.create(any(), anyLong()))
                 .thenReturn(itemDtoResponse);
         mvc.perform(post("/items")
@@ -79,7 +79,7 @@ class ItemControllerTest {
 
 
     @Test
-    void getAllItemsTest() throws Exception {
+    void shouldGetAllItemsTest() throws Exception {
         when(itemService.getAllUserItems(anyLong(), anyInt(), anyInt()))
                 .thenReturn(of(itemDtoResponse));
         mvc.perform(get("/items")
@@ -95,7 +95,7 @@ class ItemControllerTest {
     }
 
     @Test
-    void getItemTest() throws Exception {
+    void shouldGetItemTest() throws Exception {
         when(itemService.getItem(anyLong(), anyLong()))
                 .thenReturn(itemDtoResponse);
         mvc.perform(get("/items/{itemId}", 1)
@@ -108,7 +108,7 @@ class ItemControllerTest {
     }
 
     @Test
-    void updateTest() throws Exception {
+    void shouldUpdateTest() throws Exception {
         when(itemService.update(anyLong(), anyLong(), any()))
                 .thenReturn(itemDtoResponse);
         mvc.perform(patch("/items/{itemId}", 1)
@@ -125,7 +125,7 @@ class ItemControllerTest {
     }
 
     @Test
-    void saveCommentTest() throws Exception {
+    void shouldSaveCommentTest() throws Exception {
         when(itemService.addComment(anyLong(), anyLong(), any(CommentDtoRequest.class)))
                 .thenReturn(commentDto);
         mvc.perform(post("/items/{itemId}/comment", 1)
@@ -142,7 +142,7 @@ class ItemControllerTest {
     }
 
     @Test
-    void searchTest() throws Exception {
+    void searchShouldReturnItemsTest() throws Exception {
         when(itemService.search(anyString(), anyInt(), anyInt()))
                 .thenReturn(of(itemDtoResponse));
         mvc.perform(get("/items/search")
@@ -159,21 +159,19 @@ class ItemControllerTest {
     }
 
     @Test
-    void saveValidationExceptionTest() throws Exception {
-        when(itemService.create(any(), anyLong()))
-                .thenThrow(ValidationException.class);
-        mvc.perform(post("/items")
+    void searchShouldReturnEmptyListTest() throws Exception {
+        mvc.perform(get("/items/search")
                         .header(headerSharerUserId, 1)
-                        .content(mapper.writeValueAsString(itemDtoRequest))
-                        .contentType(APPLICATION_JSON)
-                        .characterEncoding(UTF_8)
-                        .accept(APPLICATION_JSON)
+                        .param("size", "1")
+                        .param("from", "0")
+                        .param("text", "")
                 )
-                .andExpect(status().isBadRequest());
+                .andExpect(jsonPath("$", hasSize(0)))
+                .andExpect(status().isOk());
     }
 
     @Test
-    void updateNotFoundExceptionTest() throws Exception {
+    void shouldNotUpdateThenThrowNotFoundExceptionTest() throws Exception {
         when(itemService.update(anyLong(), anyLong(), any()))
                 .thenThrow(EntityNotFoundException.class);
         mvc.perform(patch("/items/{itemId}", 1)
@@ -187,7 +185,7 @@ class ItemControllerTest {
     }
 
     @Test
-    void getNotFoundExceptionTest() throws Exception {
+    void shouldNotGetItemThenThrowNotFoundExceptionTest() throws Exception {
         when(itemService.getItem(anyLong(), anyLong()))
                 .thenThrow(EntityNotFoundException.class);
         mvc.perform(get("/items/{itemId}", 1)
@@ -197,12 +195,12 @@ class ItemControllerTest {
     }
 
     @Test
-    void saveCommentValidationExceptionTest() throws Exception {
+    void shouldNotCreateCommentWithEmptyDtoTest() throws Exception {
         when(itemService.addComment(anyLong(), anyLong(), any(CommentDtoRequest.class)))
                 .thenThrow(ValidationException.class);
         mvc.perform(post("/items/{itemId}/comment", 1)
                         .header(headerSharerUserId, 1)
-                        .content(mapper.writeValueAsString(commentDto))
+                        .content(mapper.writeValueAsString(CommentDtoRequest.builder().build()))
                         .contentType(APPLICATION_JSON)
                         .characterEncoding(UTF_8)
                         .accept(APPLICATION_JSON)
@@ -211,7 +209,7 @@ class ItemControllerTest {
     }
 
     @Test
-    void emptyDtoRequestTest() throws Exception {
+    void shouldNotCreateWithEmptyDtoTest() throws Exception {
         mvc.perform(post("/items", 1)
                         .header(headerSharerUserId, 1)
                         .content(mapper.writeValueAsString(ItemDtoRequest.builder().build()))
