@@ -4,6 +4,7 @@ package ru.practicum.shareit.request.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.EntityNotFoundException;
@@ -21,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @Slf4j
 @Service
@@ -55,7 +58,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public List<ResponseItemRequestDto> findAllByUserId(long userId) {
         userRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFoundException(String.format("Пользователь с id %d не существует", userId)));
-        List<ItemRequest> itemRequests = itemRequestRepository.findAllByRequesterIdOrderByCreatedDesc(userId);
+        List<ItemRequest> itemRequests = itemRequestRepository.findAllByRequesterId(userId, Sort.by(DESC, "created"));
         Map<Long, List<Item>> items = getItemsByItemRequests(itemRequests);
         List<ResponseItemRequestDto> response = ItemRequestMapper.itemRequestsToResponseItemRequestDto(itemRequests, items);
         log.info("Передаем в контроллер список запросов пользователя с id {} :{}", userId, response);
@@ -67,8 +70,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public List<ResponseItemRequestDto> findAll(long userId, int from, int size) {
         userRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFoundException(String.format("Пользователь с id %d не существует", userId)));
-        PageRequest page = PageRequest.of(from / size, size);
-        List<ItemRequest> itemRequests = itemRequestRepository.findAllByRequesterIdIsNotOrderByCreatedDesc(userId, page);
+        PageRequest page = PageRequest.of(from / size, size,Sort.by(DESC, "created"));
+        List<ItemRequest> itemRequests = itemRequestRepository.findAllByRequesterIdIsNot(userId, page);
         Map<Long, List<Item>> items = getItemsByItemRequests(itemRequests);
         List<ResponseItemRequestDto> response = ItemRequestMapper.itemRequestsToResponseItemRequestDto(itemRequests, items);
         log.info("Передаем в контроллер список запросов {}", response);

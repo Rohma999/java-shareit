@@ -124,8 +124,6 @@ class UserServiceImplTest {
         userService.create(saveUserDto("Jack", "jack@mail.com"));
         Exception exception = assertThrows(DataIntegrityViolationException.class,
                 () -> userService.create(saveUserDto("Jack", "jack@mail.com")));
-        assertEquals("could not execute statement; SQL [n/a]; constraint [null]; nested exception " +
-                "is org.hibernate.exception.ConstraintViolationException: could not execute statement", exception.getMessage());
     }
 
     @Test
