@@ -2,7 +2,8 @@ package ru.practicum.shareit.item.dto;
 
 import lombok.*;
 
-import java.util.Collection;
+
+import java.util.List;
 
 @Data
 @Builder
@@ -11,9 +12,10 @@ public class ItemDtoResponse {
     private String name;
     private String description;
     private Boolean available;
+    private Long requestId;
     private BookingDtoShort lastBooking;
     private BookingDtoShort nextBooking;
-    private Collection<CommentDtoResponse> comments;
+    private List<CommentDtoResponse> comments;
 
     @AllArgsConstructor
     @Getter

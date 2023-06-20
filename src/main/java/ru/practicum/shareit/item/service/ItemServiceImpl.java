@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
@@ -20,6 +21,8 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -38,20 +41,30 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
 
+    private final ItemRequestRepository itemRequestRepository;
+
     @Autowired
     public ItemServiceImpl(ItemRepository itemRepository, UserRepository userRepository,
-                           BookingRepository bookingRepository, CommentRepository commentRepository) {
+                           BookingRepository bookingRepository, CommentRepository commentRepository,
+                           ItemRequestRepository itemRequestRepository) {
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
         this.bookingRepository = bookingRepository;
         this.commentRepository = commentRepository;
+        this.itemRequestRepository = itemRequestRepository;
     }
 
     @Override
     public ItemDtoResponse create(ItemDtoRequest itemDto, long userId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFoundException(String.format("Пользователь с id %d не существует", userId)));
-        Item item = itemRepository.save(ItemMapper.toItem(itemDto, user));
+        Long requestId = itemDto.getRequestId();
+        ItemRequest itemRequest = null;
+        if (requestId != null) {
+            itemRequest = itemRequestRepository.findById(requestId)
+                    .orElseThrow(() -> new EntityNotFoundException("Запрос с идентификатором " + requestId + " не найден."));
+        }
+        Item item = itemRepository.save(ItemMapper.toItem(itemDto, user, itemRequest));
         log.info("Сохраняем в БД вещь : {}", item);
         ItemDtoResponse responseDto = ItemMapper.toItemDtoResponse(item, new ArrayList<>());
         log.info("Передаем в контроллер созданную вещь : {}", responseDto);
@@ -60,15 +73,16 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDtoResponse> getAllUserItems(long userId) {
+    public List<ItemDtoResponse> getAllUserItems(long userId, int from, int size) {
         userRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFoundException(String.format("Пользователь с id %d не существует", userId)));
-        List<Item> items = itemRepository.findAllByOwnerIdOrderById(userId);
+        PageRequest pageRequest = PageRequest.of(from / size, size);
+        List<Item> items = itemRepository.findAllByOwnerIdOrderById(userId, pageRequest);
         Map<Item, List<Booking>> bookings = getBookings(items);
 
         List<ItemDtoResponse> itemDtoResponses = new ArrayList<>();
         for (Item item : items) {
-            Collection<CommentDtoResponse> comment = getComments(item.getId());
+            List<CommentDtoResponse> comment = getComments(item.getId());
             ItemDtoResponse itemDto = ItemMapper.toItemDtoResponse(item, comment);
             setBookings(itemDto, bookings.get(item), LocalDateTime.now());
             itemDtoResponses.add(itemDto);
@@ -84,7 +98,7 @@ public class ItemServiceImpl implements ItemService {
                 () -> new EntityNotFoundException(String.format("Вещь с id %d не существует", itemId))
         );
         User user = item.getOwner();
-        Collection<CommentDtoResponse> comments = getComments(itemId);
+        List<CommentDtoResponse> comments = getComments(itemId);
         ItemDtoResponse responseDto;
         if (!user.getId().equals(userId)) {
             responseDto = ItemMapper.toItemDtoResponse(item, comments);
@@ -115,7 +129,7 @@ public class ItemServiceImpl implements ItemService {
                 () -> new EntityNotFoundException(String.format("Вещь с id %d не существует", itemId))
         );
         if (item.getOwner().getId() != userId) {
-            throw new NotOwnerException("Вы не являетесь владельцем данной вещи.");
+            throw new NotOwnerException("Вы не являетесь владельцем данной вещи");
         }
         String name = itemDtoRequest.getName();
         String description = itemDtoRequest.getDescription();
@@ -129,7 +143,7 @@ public class ItemServiceImpl implements ItemService {
         if (available != null) {
             item.setAvailable(available);
         }
-        Collection<CommentDtoResponse> comments = getComments(itemId);
+        List<CommentDtoResponse> comments = getComments(itemId);
         Item updateItem = itemRepository.save(item);
         log.info("Обновляем в БД вещь : {}", updateItem);
         ItemDtoResponse responseDto = ItemMapper.toItemDtoResponse(updateItem, comments);
@@ -139,10 +153,11 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDtoResponse> search(String text) {
-        List<ItemDtoResponse> items = itemRepository.search(text)
+    public List<ItemDtoResponse> search(String text, int from, int size) {
+        PageRequest pageRequest = PageRequest.of(from / size, size);
+        List<ItemDtoResponse> items = itemRepository.search(text, pageRequest)
                 .stream().map(item -> {
-                    Collection<CommentDtoResponse> comments = getComments(item.getId());
+                    List<CommentDtoResponse> comments = getComments(item.getId());
                     return ItemMapper.toItemDtoResponse(item, comments);
                 }).collect(Collectors.toList());
         log.info("Передаем в контроллер найденные вещи : {} ", items);
@@ -190,7 +205,7 @@ public class ItemServiceImpl implements ItemService {
                 new ItemDtoResponse.BookingDtoShort(nextBooking.getId(), nextBooking.getBooker().getId()));
     }
 
-    private Collection<CommentDtoResponse> getComments(long itemId) {
+    private List<CommentDtoResponse> getComments(long itemId) {
         return commentRepository.findAllByItemId(itemId).stream()
                 .map(CommentMapper::toCommentDtoResponse).collect(Collectors.toList());
     }

@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,11 +10,13 @@ import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.group.Create;
 
+import javax.validation.constraints.Min;
 import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping(path = "/bookings")
+@Validated
 public class BookingController {
 
     public static final String USER_ID = "X-Sharer-User-Id";
@@ -56,19 +58,25 @@ public class BookingController {
     @GetMapping
     public List<BookingDtoResponse> findAllByBookerId(
             @RequestParam(defaultValue = "ALL") BookingState state,
-            @RequestHeader(USER_ID) long userId
+            @RequestHeader(USER_ID) long userId,
+            @RequestParam(name = "from", defaultValue = "0") @Min(0) int from,
+            @RequestParam(name = "size", defaultValue = "10") @Min(1) int size
     ) {
-        log.info("Запрос на получение всех бронирований пользователя с id {} и состоянием {}", userId, state);
-        return bookingService.findAllByBookerId(state, userId);
+        log.info("Запрос на получение всех бронирований пользователя с id {} и состоянием {} ,с {},количество {}",
+                userId, state,from,size);
+        return bookingService.findAllByBookerId(state, userId,from,size);
     }
 
     @GetMapping("/owner")
     public List<BookingDtoResponse> findAllByOwnerId(
             @RequestParam(defaultValue = "ALL") BookingState state,
-            @RequestHeader(USER_ID) long userId
+            @RequestHeader(USER_ID) long userId,
+            @RequestParam(name = "from", defaultValue = "0") @Min(0) int from,
+            @RequestParam(name = "size", defaultValue = "10") @Min(1) int size
     ) {
-        log.info("Запрос на получение всех бронирований у владельца с id {} и состоянием {}", userId, state);
-        return bookingService.findAllByOwnerId(state, userId);
+        log.info("Запрос на получение всех бронирований у владельца с id {} и состоянием {},с {},количество {}",
+                userId, state,from,size);
+        return bookingService.findAllByOwnerId(state, userId,from,size);
     }
 
 }

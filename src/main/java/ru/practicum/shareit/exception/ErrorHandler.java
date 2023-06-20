@@ -47,13 +47,6 @@ public class ErrorHandler {
         return new ErrorResponse(fieldErrors.toString());
     }
 
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler
-    public ErrorResponse handleEmailAlreadyExistException(final EmailAlreadyExistException e) {
-        log.error("500 {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
-    }
-
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationException(final ValidationException e) {
